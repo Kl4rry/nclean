@@ -13,6 +13,8 @@ struct Args {
     force: bool,
     #[clap(short = 'd', long)]
     directory: Option<String>,
+    #[clap(short = 't', long = "no-trim")]
+    no_trim: bool,
 }
 
 fn main() -> Result<()> {
@@ -31,7 +33,10 @@ fn main() -> Result<()> {
             if stem.contains(&args.pattern) {
                 if let Some(ext) = path.extension() {
                     let extension = ext.to_string_lossy();
-                    let new_stem = stem.replace(&args.pattern, replace);
+                    let mut new_stem = stem.replace(&args.pattern, replace);
+                    if !args.no_trim {
+                        new_stem = new_stem.trim().to_string();
+                    }
                     let to = format!("{}.{}", new_stem, extension);
                     renames.push((path.to_string_lossy().to_string(), to));
                 }
